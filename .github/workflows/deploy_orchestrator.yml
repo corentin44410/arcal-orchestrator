@@ -33,7 +33,6 @@ jobs:
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
       - name: 🏗️ Build and Push Docker image
-        # 👇 C'est ici que la ligne a été supprimée
         run: |
           docker build --platform linux/amd64 -t ${{ env.ACR_NAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }} .
           docker build --platform linux/amd64 -t ${{ env.ACR_NAME }}/${{ env.IMAGE_NAME }}:latest .
@@ -41,20 +40,20 @@ jobs:
           docker push ${{ env.ACR_NAME }}/${{ env.IMAGE_NAME }}:latest
 
       - name: 🚀 Deploy to Azure Container Apps
-              uses: azure/cli@v2
-              with:
-                azcliversion: latest
-                inlineScript: |
-                  echo "1. Autorisation de l'App à lire le registre privé..."
-                  az containerapp registry set \
-                    --name ${{ env.CONTAINER_APP_NAME }} \
-                    --resource-group ${{ env.RESOURCE_GROUP }} \
-                    --server ${{ env.ACR_NAME }} \
-                    --username ${{ secrets.REGISTRY_USERNAME }} \
-                    --password ${{ secrets.REGISTRY_PASSWORD }}
-                    
-                  echo "2. Mise à jour de l'Azure Container App avec la nouvelle image..."
-                  az containerapp update \
-                    --name ${{ env.CONTAINER_APP_NAME }} \
-                    --resource-group ${{ env.RESOURCE_GROUP }} \
-                    --image ${{ env.ACR_NAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+        uses: azure/cli@v2
+        with:
+          azcliversion: latest
+          inlineScript: |
+            echo "1. Autorisation de l'App à lire le registre privé..."
+            az containerapp registry set \
+              --name ${{ env.CONTAINER_APP_NAME }} \
+              --resource-group ${{ env.RESOURCE_GROUP }} \
+              --server ${{ env.ACR_NAME }} \
+              --username ${{ secrets.REGISTRY_USERNAME }} \
+              --password ${{ secrets.REGISTRY_PASSWORD }}
+              
+            echo "2. Mise à jour de l'Azure Container App avec la nouvelle image..."
+            az containerapp update \
+              --name ${{ env.CONTAINER_APP_NAME }} \
+              --resource-group ${{ env.RESOURCE_GROUP }} \
+              --image ${{ env.ACR_NAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
