@@ -21,6 +21,8 @@ pnpm-debug.log*
 *.swp
 *.suo
 
+.azure/
+
 # OS
 .DS_Store
 .AppleDouble
