@@ -43,3 +43,6 @@ Afin de ne pas perdre la trace des ventes en cas de redémarrage ou de mise à l
 ## ⚙️ Configuration (.env)
 
 Ce fichier est critique. Il doit contenir les identifiants du **Service Principal** Azure.
+
+## ☁️ Déploiement (CI/CD)
+L'Orchestrateur est conçu pour être déployé sur Azure Container Apps au sein du même Virtual Network que les Moteurs (Engines) qu'il crée. Cela garantit que la communication gRPC s'effectue sur le réseau privé Microsoft, avec une latence quasi-nulle et une sécurité maximale. Le déploiement est automatisé via GitHub Actions.
