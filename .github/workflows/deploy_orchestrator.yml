@@ -5,8 +5,6 @@ on:
   push:
     branches:
       - main
-    paths:
-      - 'orchestrator/**' 
   workflow_dispatch: # Permet de lancer le job manuellement depuis l'interface GitHub
 
 env:
