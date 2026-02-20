@@ -1,0 +1,26 @@
+# Dependency directories
+node_modules/
+
+# NestJS build output (CRITIQUE)
+dist/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment variables (SÉCURITÉ MAXIMALE)
+.env
+.env.production
+.env.development
+
+# IDE
+.idea
+.vscode
+*.swp
+*.suo
+
+# OS
+.DS_Store
+.AppleDouble

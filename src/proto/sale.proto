@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package sale;
+
+// Définition du service que l'Engine doit implémenter
+service SaleEngineService {
+  rpc StartSale (SaleRequest) returns (SaleResponse);
+  rpc StopSale (SaleRequest) returns (SaleResponse);
+}
+
+message SaleRequest {
+  string saleId = 1;
+}
+
+message SaleResponse {
+  bool success = 1;
+  string message = 2;
+}
