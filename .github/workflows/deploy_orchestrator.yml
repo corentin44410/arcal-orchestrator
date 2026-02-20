@@ -1,0 +1,56 @@
+name: Deploy Orchestrator to Azure
+
+# Se déclenche quand tu pousses sur la branche main (dans le dossier orchestrator)
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'orchestrator/**' 
+  workflow_dispatch: # Permet de lancer le job manuellement depuis l'interface GitHub
+
+env:
+  ACR_NAME: 'acrarcalpoc4030.azurecr.io'
+  IMAGE_NAME: 'orchestrator'
+  RESOURCE_GROUP: 'rg-arcal-poc'
+  CONTAINER_APP_NAME: 'arcal-orchestrator'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔐 Login to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: 🐳 Login to Azure Container Registry
+        uses: azure/docker-login@v2
+        with:
+          login-server: ${{ env.ACR_NAME }}
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+
+      - name: 🏗️ Build and Push Docker image
+        run: |
+          cd orchestrator
+          # On utilise le SHA du commit pour versionner proprement l'image
+          docker build --platform linux/amd64 -t ${{ env.ACR_NAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }} .
+          docker build --platform linux/amd64 -t ${{ env.ACR_NAME }}/${{ env.IMAGE_NAME }}:latest .
+          docker push ${{ env.ACR_NAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+          docker push ${{ env.ACR_NAME }}/${{ env.IMAGE_NAME }}:latest
+
+      - name: 🚀 Deploy to Azure Container Apps
+        uses: azure/cli@v2
+        with:
+          azcliversion: latest
+          inlineScript: |
+            echo "Mise à jour de l'Azure Container App..."
+            az containerapp update \
+              --name ${{ env.CONTAINER_APP_NAME }} \
+              --resource-group ${{ env.RESOURCE_GROUP }} \
+              --image ${{ env.ACR_NAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
