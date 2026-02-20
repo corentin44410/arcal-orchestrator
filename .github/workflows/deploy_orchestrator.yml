@@ -1,11 +1,10 @@
 name: Deploy Orchestrator to Azure
 
-# Se déclenche quand tu pousses sur la branche main (dans le dossier orchestrator)
 on:
   push:
     branches:
       - main
-  workflow_dispatch: # Permet de lancer le job manuellement depuis l'interface GitHub
+  workflow_dispatch:
 
 env:
   ACR_NAME: 'acrarcalpoc4030.azurecr.io'
@@ -34,9 +33,8 @@ jobs:
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
       - name: 🏗️ Build and Push Docker image
+        # 👇 C'est ici que la ligne a été supprimée
         run: |
-          cd orchestrator
-          # On utilise le SHA du commit pour versionner proprement l'image
           docker build --platform linux/amd64 -t ${{ env.ACR_NAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }} .
           docker build --platform linux/amd64 -t ${{ env.ACR_NAME }}/${{ env.IMAGE_NAME }}:latest .
           docker push ${{ env.ACR_NAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
